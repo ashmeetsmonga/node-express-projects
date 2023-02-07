@@ -35,7 +35,7 @@ const updateTask = async (req, res) => {
 			runValidators: true,
 		});
 		if (!task) return res.status(404).json({ msg: `No task with id: ${req.params.id}` });
-		res.status(200).json(task);
+		res.status(200).json({ task, completed: true });
 	} catch (err) {
 		res.status(500).json(err);
 	}
