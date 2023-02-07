@@ -3,6 +3,7 @@ const connectDB = require("./db/connect");
 const tasks = require("./routes/tasks");
 require("dotenv").config();
 const notFound = require("./middleware/notFound");
+const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 const PORT = 5000;
@@ -14,7 +15,7 @@ app.use(express.json());
 app.use("/api/v1/tasks", tasks);
 
 app.use(notFound);
-
+app.use(errorHandler);
 const start = async () => {
 	try {
 		await connectDB(process.env.MONGO_URI);
