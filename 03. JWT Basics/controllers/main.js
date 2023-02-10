@@ -1,12 +1,17 @@
+const CustomAPIError = require("../errors/custom-error");
+
 const login = async (req, res) => {
-	return res.json({ msg: "Fake login/register", body: req.body });
+	const { username, password } = req.body;
+	console.log(username, password);
+	if (!username || !password) {
+		throw new CustomAPIError("Please provide username and password", 400);
+	}
+	res.send("Fake login");
 };
 
 const dashboard = async (req, res) => {
 	const randomNumber = Math.floor(Math.random() * 100);
-	return res
-		.status(200)
-		.json({ msg: "Hello user", secret: `Your lucky number is ${randomNumber}` });
+	res.status(200).json({ msg: "Hello user", secret: `Your lucky number is ${randomNumber}` });
 };
 
 module.exports = { login, dashboard };
