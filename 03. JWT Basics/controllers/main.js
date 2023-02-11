@@ -18,8 +18,18 @@ const dashboard = async (req, res) => {
 	const authHeader = req.headers.authorization;
 	if (!authHeader || !authHeader.startsWith("Bearer"))
 		throw new CustomAPIError("No token found", 401);
-	const randomNumber = Math.floor(Math.random() * 100);
-	res.status(200).json({ msg: "Hello user", secret: `Your lucky number is ${randomNumber}` });
+
+	const token = authHeader.split(" ")[1];
+
+	try {
+		const decoded = jwt.verify(token, process.env.JWT_SECRET);
+		const randomNumber = Math.floor(Math.random() * 100);
+		res
+			.status(200)
+			.json({ msg: `Hello ${decoded.username}`, secret: `Your lucky number is ${randomNumber}` });
+	} catch (err) {
+		throw new CustomAPIError("Not authorised", 401);
+	}
 };
 
 module.exports = { login, dashboard };
