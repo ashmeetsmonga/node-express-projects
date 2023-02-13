@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, UnauthenticatedError } = require("../errors");
 const User = require("../models/User");
-const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 const register = async (req, res) => {
 	const { name, email, password } = req.body;
@@ -20,10 +20,14 @@ const login = async (req, res) => {
 		throw new BadRequestError("Please provide email and password");
 	}
 
-	const user = await User.findOne(req.body);
-	if (!user) throw new UnauthenticatedError("Please provide correct email and password");
+	const user = await User.findOne({ email });
+	if (!user) throw new UnauthenticatedError("Invalid Credentials");
+
+	const isPasswordCorrect = await user.comparePassword(password);
+	if (!isPasswordCorrect) throw new UnauthenticatedError("Invalid Credentials");
+
 	const token = user.createJWT();
-	res.status(StatusCodes.ACCEPTED).json({ user: { name: user.name }, token });
+	res.status(StatusCodes.OK).json({ user: { name: user.name }, token });
 };
 
 module.exports = { register, login };
