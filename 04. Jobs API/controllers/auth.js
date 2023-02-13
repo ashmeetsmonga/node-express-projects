@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError } = require("../errors");
 const User = require("../models/User");
-const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const register = async (req, res) => {
 	const { username, email, password } = req.body;
@@ -10,7 +10,14 @@ const register = async (req, res) => {
 	}
 
 	const newUser = await User.create({ ...req.body });
-	res.status(StatusCodes.CREATED).json(newUser);
+	const token = jwt.sign(
+		{ userId: newUser._id, username: newUser.username },
+		process.env.JWT_SECRET,
+		{
+			expiresIn: "30d",
+		}
+	);
+	res.status(StatusCodes.CREATED).json({ user: { username: newUser.username }, token });
 };
 
 const login = async (req, res) => {
