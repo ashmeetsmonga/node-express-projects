@@ -9,10 +9,7 @@ const register = async (req, res) => {
 		throw new BadRequestError("Please provide username, email and password");
 	}
 
-	const salt = await bcrypt.genSalt(10);
-	const hashedPassword = await bcrypt.hash(password, salt);
-
-	const newUser = await User.create({ ...req.body, password: hashedPassword });
+	const newUser = await User.create({ ...req.body });
 	res.status(StatusCodes.CREATED).json(newUser);
 };
 
