@@ -16,7 +16,7 @@ const getJob = async (req, res) => {
 
 const getAllJobs = async (req, res) => {
 	const jobs = await Job.find({ createdBy: req.user.userId }).sort("createdAt");
-	res.status(StatusCodes.OK).json({ jobs, count: jobs.length });
+	res.status(StatusCodes.OK).json({ count: jobs.length, jobs });
 };
 
 const createJob = async (req, res) => {
@@ -43,7 +43,15 @@ const updateJob = async (req, res) => {
 };
 
 const deleteJob = async (req, res) => {
-	res.send("deleteJob");
+	const {
+		user: { userId },
+		params: { jobId },
+	} = req;
+	const job = await Job.findByIdAndDelete({ _id: jobId, createdBy: userId });
+
+	if (!job) throw new BadRequestError("Job does not exist");
+
+	res.status(StatusCodes.OK).json({ msg: "Deleted Successfully" });
 };
 
 module.exports = { getJob, getAllJobs, createJob, updateJob, deleteJob };
