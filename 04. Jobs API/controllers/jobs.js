@@ -1,5 +1,5 @@
 const { StatusCodes } = require("http-status-codes");
-const { NotFoundError } = require("../errors");
+const { NotFoundError, BadRequestError } = require("../errors");
 const Job = require("../models/Job");
 
 const getJob = async (req, res) => {
@@ -26,7 +26,20 @@ const createJob = async (req, res) => {
 };
 
 const updateJob = async (req, res) => {
-	res.send("updateJob");
+	const {
+		user: { userId },
+		params: { jobId },
+		body: { company, position },
+	} = req;
+
+	if (company === "" || position === "")
+		throw new BadRequestError("Company/position cannot be empty");
+	console.log(req.user);
+	const job = await Job.findByIdAndUpdate({ _id: jobId, createdBy: userId }, req.body, {
+		new: true,
+		runValidators: true,
+	});
+	return res.status(StatusCodes.OK).json(job);
 };
 
 const deleteJob = async (req, res) => {
